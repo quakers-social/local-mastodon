@@ -1,0 +1,4 @@
+public/
+redis/ 
+postgres14/
+.env.production
