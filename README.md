@@ -14,10 +14,14 @@ docker exec -it local-mastodon-web-1 /bin/bash
 
 
 ## Restart from scratch
-rm -rf public redis postgres14
 
+Remote volumes are mapped to these local directories:
+```
+rm -rf public redis postgres14
+```
 
 ## Initial Setup
+
 Seems like mastodon wants to know its own hostname
 or maybe its just that its local ip address is different
 
@@ -26,6 +30,11 @@ add this line to `/etc/hosts`
 127.0.0.1	mastodon.local
 ```
 
+Not quite sure why the following particular environment vars are needed 
+for setup. I initially tried using [these instructions](https://www.flynsarmy.com/2023/10/running-a-mastodon-instance-with-docker/) and then simplified by matching these
+to what the setup script prompts for. 
+
+```
 mkdir -p public/system redis postgres14
 cat << EOM > .env.production
 DB_HOST=db
@@ -37,10 +46,14 @@ REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_PASSWORD=
 EOM
+```
 
+Run the Rails mastodon setup:
+```
 docker-compose run --rm web bundle exec rake mastodon:setup
+```
 
-
+Output including the answers that seem to work for me:
 
 ```
 Your instance is identified by its domain name. Changing it afterward will break things.
@@ -81,7 +94,7 @@ Below is your configuration, save it to an .env.production file outside Docker:
 # using docker-compose or not.
 ```
 
-... all your variables here
+... all your variables here ... **copy into local `.env.production` file**
 
 ```
 It is also saved within this container so you can proceed with this wizard.
@@ -102,8 +115,12 @@ Username: admin
 E-mail: admin@mastodon.local
 ```
 
+Now all the servers can be started up:
 ```
 docker compose up -d
 ```
+
+If you are using Chrome, it doesn't like to use http, but using incognito 
+window will prevent it from forcing https
 
 go to: http://mastodon.local:3000/
